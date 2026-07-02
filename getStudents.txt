@@ -1,0 +1,74 @@
+const SPREADSHEET_ID = '1LPJJnGmb7I_okIQaeAiflr99VCtLv6Xc-x_g9B8n3V8'; 
+const SHEET_NAME = 'students';
+
+function doGet(e) {
+  const action = e.parameter.action || "";
+  switch (action) {
+    case "getStudents":
+      return jsonResponse(getStudents());
+
+    default:
+      return jsonResponse({
+        status: false,
+        message: "Invalid Action"
+      });
+  }
+}
+
+/*************************************************
+ * Response JSON
+ *************************************************/
+function jsonResponse(data) {
+  return ContentService
+    .createTextOutput(JSON.stringify(data))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+/*************************************************
+ * ฟังก์ชัน : getStudents()
+ * หน้าที่ : อ่านข้อมูลนักศึกษาทั้งหมดจาก Google Sheets
+ * แล้วแปลงเป็น JSON ส่งกลับไปยัง Web API
+ *************************************************/
+function getStudents() {
+  const sheet = SpreadsheetApp
+    .openById(SPREADSHEET_ID)         // เปิด Spreadsheet จาก Spreadsheet ID
+    .getSheetByName(SHEET_NAME);      // เลือก Sheet ที่ต้องการใช้งาน
+  const values = sheet.getDataRange().getValues(); // อ่านข้อมูลทั้งหมดในชีต ผลลัพธ์จะเป็น Array 2 มิติ
+  const headers = values[0];                    // อ่านข้อมูลแถวแรก ซึ่งเป็นชื่อคอลัมน์ (Header)
+  let students = [];                            // สร้าง Array ว่าง สำหรับเก็บข้อมูลนักศึกษาทั้งหมด 
+  for (let i = 1; i < values.length; i++) {     // เริ่มอ่านข้อมูลตั้งแต่แถวที่ 2 (i = 1 เพราะแถวแรกเป็น Header)
+    let student = {};                           // สร้าง Object ว่าง สำหรับเก็บข้อมูลนักศึกษา 1 คน
+    headers.forEach(function(header, index) {   // วนลูปตามจำนวน Header
+      student[header] = values[i][index];       // นำชื่อ Header มาเป็นชื่อ Property ของ Object
+    });
+    students.push(student);  // เพิ่มข้อมูลนักศึกษา ลงใน Array students
+  }
+  Logger.log(JSON.stringify(students));
+  return {                   // ส่งข้อมูลกลับในรูปแบบ JSON
+    status: true,            // สถานะการทำงาน
+    count: students.length,  // จำนวนข้อมูลทั้งหมด
+    data: students           // รายการนักศึกษาทั้งหมด
+  };
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
