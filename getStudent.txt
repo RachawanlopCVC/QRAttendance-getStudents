@@ -1,0 +1,48 @@
+
+// เอาไปใส่ที่ี function doGet(e)
+// ที่ switch
+//
+case "getStudent":
+	return jsonResponse(getStudent(e.parameter.StudentID));
+
+
+/*************************************************
+ * ฟังก์ชัน : getStudent(studentID)
+ * หน้าที่ :
+ * ค้นหาข้อมูลนักศึกษา 1 คน
+ * จาก Google Sheets
+ * โดยใช้ StudentID
+ *
+ * ตัวอย่าง
+ * exec?action=getStudent&StudentID=S001
+ *************************************************/
+function getStudent(studentID) {
+  if (!studentID) {
+    return {
+      status: false,
+      message: "StudentID is required"
+    };
+  }
+  const sheet = SpreadsheetApp
+    .openById(SPREADSHEET_ID)
+    .getSheetByName(SHEET_NAME);
+  const values = sheet.getDataRange().getValues();
+  const headers = values[0];
+  for (let i = 1; i < values.length; i++) {
+    if (values[i][0] == studentID) {     // ตรวจสอบว่า StudentID ตรงกับที่ผู้ใช้ค้นหาหรือไม่
+      let student = {};
+      headers.forEach(function(header, index) {
+        student[header] = values[i][index];
+      });
+      return {
+        status: true,
+        message: "Success",
+        data: student
+      };
+    }
+  }
+  return {
+    status: false,
+    message: "Student Not Found"
+  };
+}
