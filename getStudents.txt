@@ -1,22 +1,43 @@
+
 const SPREADSHEET_ID = '1LPJJnGmb7I_okIQaeAiflr99VCtLv6Xc-x_g9B8n3V8'; 
 const SHEET_NAME = 'students';
 
+/*************************************************
+ * ฟังก์ชัน : doGet(e)
+ * หน้าที่ : รับคำสั่ง (Action) จาก URL
+ * และเรียกใช้งานฟังก์ชันที่เกี่ยวข้อง
+ *
+ * ตัวอย่าง URL
+ * /exec?action=getStudents
+ *************************************************/
 function doGet(e) {
-  const action = e.parameter.action || "";
-  switch (action) {
+  const action = e.parameter.action || "";  // ถ้าไม่มีการส่ง action มา จะกำหนดให้เป็นข้อความว่าง ("")
+  switch (action) {                         // ตรวจสอบค่าของ action เพื่อเลือกว่าจะเรียกฟังก์ชันใด
+    // -----------------------------
+    // อ่านข้อมูลนักศึกษาทั้งหมด
+    // URL:
+    // /exec?action=getStudents
+    // -----------------------------
     case "getStudents":
+      // เรียกฟังก์ชัน getStudents() แล้วส่งผลลัพธ์กลับในรูปแบบ JSON
       return jsonResponse(getStudents());
-
+    // -----------------------------
+    // กรณีไม่พบ Action ที่กำหนด
+    // -----------------------------
     default:
-      return jsonResponse({
-        status: false,
-        message: "Invalid Action"
+      return jsonResponse({       // ส่งข้อความแจ้งเตือนกลับ
+        status: false,            // สถานะการทำงาน
+        message: "Invalid Action" // ข้อความแจ้งเตือน
       });
   }
 }
 
 /*************************************************
- * Response JSON
+ * ฟังก์ชัน : jsonResponse(data)
+ * หน้าที่ :
+ * แปลงข้อมูล (Object หรือ Array)
+ * ให้เป็นข้อความ JSON
+ * แล้วส่งกลับไปยังผู้ใช้งาน
  *************************************************/
 function jsonResponse(data) {
   return ContentService
